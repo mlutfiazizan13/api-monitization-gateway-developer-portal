@@ -1,6 +1,6 @@
 # API Gateway — Developer Portal
 
-A Next.js developer portal for the [API Monetization Gateway](../api-monetization-gateway) backend. Provides a full self-service interface for managing API keys, monitoring usage, and handling billing.
+A Next.js developer portal for the [API Monetization Gateway](../api-monetization-gateway) backend. Provides a full self-service interface for managing API keys, monitoring usage, handling billing, and configuring the gateway.
 
 ## Features
 
@@ -10,6 +10,8 @@ A Next.js developer portal for the [API Monetization Gateway](../api-monetizatio
 - **Usage Analytics** — Time-series charts, latency tracking, per-endpoint breakdown
 - **Billing** — Plan comparison, upgrade/downgrade, Stripe invoice history
 - **Documentation** — Interactive API reference with copy-ready code examples
+- **Upstreams** — Create and manage upstream services with load balancing and target pools
+- **Routes** — Define path-prefix routing rules that map to upstreams
 
 ## Tech Stack
 
@@ -38,7 +40,9 @@ developer-portal/
 │   │   ├── dashboard/keys/         # API key management
 │   │   ├── dashboard/usage/        # Usage analytics
 │   │   ├── dashboard/billing/      # Plans & invoices
-│   │   └── dashboard/docs/         # API documentation
+│   │   ├── dashboard/docs/         # API documentation
+│   │   ├── dashboard/upstreams/    # Upstream service management
+│   │   └── dashboard/routes/       # Route configuration
 │   ├── layout.tsx                  # Root layout
 │   └── page.tsx                    # Root redirect
 ├── components/
@@ -81,10 +85,10 @@ Open [http://localhost:3000](http://localhost:3000).
 Copy `.env.local` and set the backend URL:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:8080
+NEXT_PUBLIC_API_URL=http://localhost:8070
 ```
 
-The backend defaults to port `8080`. Update this if your gateway runs on a different port.
+The backend defaults to port `8070`. Update this if your gateway runs on a different port.
 
 ### Building for Production
 
@@ -103,6 +107,8 @@ This portal connects to the following backend endpoints:
 | Keys | `GET /keys`, `POST /keys`, `DELETE /keys/{id}`, `POST /keys/{id}/rotate` |
 | Usage | `GET /usage`, `GET /usage/timeline`, `GET /usage/endpoints` |
 | Billing | `GET /billing/plan`, `POST /billing/upgrade`, `GET /billing/invoices`, `GET /billing/portal` |
+| Upstreams | `GET /upstreams`, `POST /upstreams`, `GET /upstreams/{id}`, `PUT /upstreams/{id}`, `DELETE /upstreams/{id}`, `POST /upstreams/{id}/targets`, `DELETE /upstreams/{id}/targets/{targetId}` |
+| Routes | `GET /routes`, `POST /routes`, `GET /routes/{id}`, `PUT /routes/{id}`, `DELETE /routes/{id}` |
 | Gateway | `ANY /gateway/{path}` |
 
 ## Plans
@@ -136,3 +142,4 @@ curl "https://your-gateway/gateway/endpoint?api_key=gw_your_key_here"
 - All API calls go through `lib/api.ts` — update `NEXT_PUBLIC_API_URL` to point to your backend
 - SWR handles data fetching with automatic revalidation; cache keys follow the pattern `['resource', ...params]`
 - Charts use `recharts` with responsive containers — no SSR issues since all chart components are client-only
+- The sidebar splits navigation into two groups: general portal pages and a **Gateway Config** section (Upstreams, Routes)
